@@ -1,0 +1,35 @@
+name: Fetch Reservations
+
+on:
+  schedule:
+    - cron: '0 0 * * *' # Runs every 24 hours at midnight UTC
+  workflow_dispatch: # Allows you to manually trigger the workflow from GitHub Actions
+
+jobs:
+  fetch_and_push:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.x'
+
+    - name: Install Dependencies
+      run: pip install gspread google-auth
+
+    - name: Run Fetch Reservations Script
+      env:
+        GOOGLE_APPLICATION_CREDENTIALS: service_account_key.json
+      run: python fetchreservations.py
+
+    - name: Push Updated JSON
+      run: |
+        git config --global user.name "github-actions[bot]"
+        git config --global user.email "github-actions[bot]@users.noreply.github.com"
+        git add google_sheet_data.json
+        git commit -m "Update reservations JSON file"
+        git push
