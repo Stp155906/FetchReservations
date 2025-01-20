@@ -27,9 +27,12 @@ jobs:
       run: python fetchreservations.py
 
     - name: Push Updated JSON
+      env:
+        GH_PAT: ${{ secrets.GH_PAT }}
       run: |
         git config --global user.name "github-actions[bot]"
         git config --global user.email "github-actions[bot]@users.noreply.github.com"
+        git remote set-url origin https://x-access-token:${GH_PAT}@github.com/${{ github.repository }}.git
         git add google_sheet_data.json
         git commit -m "Update reservations JSON file"
         git push
